@@ -61,10 +61,20 @@
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         container.className = "unity-mobile";
-        config.devicePixelRatio = 1;
+        config.devicePixelRatio = 1.5;
       }
       canvas.style.background = "url('" + buildUrl + "/2925-WebGL.jpg') center / cover";
       loadingCover.style.display = "";
+
+      function resizeCanvas() {
+        const dpr = config.devicePixelRatio || 1;
+        canvas.width = canvas.clientWidth * dpr;
+        canvas.height = canvas.clientHeight * dpr;
+        canvas.style.width = canvas.clientWidth + "px";
+        canvas.style.height = canvas.clientHeight + "px";
+        const ctx = canvas.getContext("webgl2") || canvas.getContext("webgl");
+        if (ctx) ctx.viewport(0, 0, canvas.width, canvas.height);
+      }
 
       const script = document.createElement("script");
       script.src = loaderUrl;
@@ -74,6 +84,7 @@
           progressBarEmpty.style.display = "";
           progressBarFull.style.width = `${100 * progress}%`;
         }).then((unityInstance) => {
+          resizeCanvas(); // підлаштовуємо canvas під DPR
           loadingCover.style.display = "none";
           if (canFullscreen) {
             if (!hideFullScreenButton) {
